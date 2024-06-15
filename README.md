@@ -8,7 +8,6 @@ This project is a simple web application that reads aloud text content from a we
 - [Usage](#usage)
 - [Dependencies](#dependencies)
 - [Compatibility](#compatibility)
-- [License](#license)
 
 ## Features
 - **Start Reading Button**: Initiates the reading of the text content.

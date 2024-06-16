@@ -9,39 +9,52 @@ let utterance = null;
 if (!synth) {
     console.error('Speech synthesis not supported.');
 } else {
-    // Check if speaking is supported
+    // Check if speaking methods are supported
+    if (!synth.speak || !synth.resume || !synth.pause || !synth.cancel) {
+        console.warn('Speech synthesis methods not fully supported.');
+    }
+
+    // Attempt to start speech synthesis immediately
+    startSpeechSynthesis();
+}
+
+// Function to start speech synthesis
+function startSpeechSynthesis() {
     if (!synth.speaking) {
-        console.warn('Speech synthesis speaking not supported.');
+        utterance = new SpeechSynthesisUtterance(paragraph.textContent);
+        utterance.addEventListener('end', () => {
+            isSpeaking = false;
+            if (startButton) startButton.innerText = 'Start Reading';
+        });
+        synth.speak(utterance);
+        isSpeaking = true;
+        if (startButton) startButton.innerText = 'Pause Reading';
+    } else {
+        synth.resume();
+        isSpeaking = true;
+        if (startButton) startButton.innerText = 'Pause Reading';
     }
 }
 
-startButton.addEventListener('click', () => {
-    if (!isSpeaking) {
-        if (!synth.speaking) {
-            utterance = new SpeechSynthesisUtterance(paragraph.textContent);
-            utterance.addEventListener('end', () => {
-                isSpeaking = false;
-                startButton.innerText = 'Start Reading';
-            });
-            synth.speak(utterance);
-            isSpeaking = true;
-            startButton.innerText = 'Pause Reading';
+// Event listeners for buttons (if needed)
+if (startButton) {
+    startButton.addEventListener('click', () => {
+        if (!isSpeaking) {
+            startSpeechSynthesis();
         } else {
-            synth.resume();
-            isSpeaking = true;
-            startButton.innerText = 'Pause Reading';
+            synth.pause();
+            isSpeaking = false;
+            startButton.innerText = 'Resume Reading';
         }
-    } else {
-        synth.pause();
-        isSpeaking = false;
-        startButton.innerText = 'Resume Reading';
-    }
-});
+    });
+}
 
-stopButton.addEventListener('click', () => {
-    if (isSpeaking) {
-        synth.cancel();
-        isSpeaking = false;
-        startButton.innerText = 'Start Reading';
-    }
-});
+if (stopButton) {
+    stopButton.addEventListener('click', () => {
+        if (isSpeaking) {
+            synth.cancel();
+            isSpeaking = false;
+            if (startButton) startButton.innerText = 'Start Reading';
+        }
+    });
+}

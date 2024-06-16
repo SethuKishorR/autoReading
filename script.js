@@ -5,6 +5,16 @@ let isSpeaking = false;
 let synth = window.speechSynthesis;
 let utterance = null;
 
+// Check if speech synthesis is supported
+if (!synth) {
+    console.error('Speech synthesis not supported.');
+} else {
+    // Check if speaking is supported
+    if (!synth.speaking) {
+        console.warn('Speech synthesis speaking not supported.');
+    }
+}
+
 startButton.addEventListener('click', () => {
     if (!isSpeaking) {
         if (!synth.speaking) {
@@ -35,11 +45,3 @@ stopButton.addEventListener('click', () => {
         startButton.innerText = 'Start Reading';
     }
 });
-
-if (!synth) {
-    console.error('Speech synthesis not supported.');
-} else {
-    if (!synth.speaking) {
-        console.warn('Speech synthesis speaking not supported.');
-    }
-}

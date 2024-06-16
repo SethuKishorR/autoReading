@@ -1,4 +1,3 @@
-// script.js
 const paragraph = document.getElementById('paragraph');
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
@@ -36,3 +35,11 @@ stopButton.addEventListener('click', () => {
         startButton.innerText = 'Start Reading';
     }
 });
+
+if (!synth) {
+    console.error('Speech synthesis not supported.');
+} else {
+    if (!synth.speaking) {
+        console.warn('Speech synthesis speaking not supported.');
+    }
+}

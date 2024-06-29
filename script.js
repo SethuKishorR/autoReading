@@ -1,6 +1,3 @@
-const paragraph = document.getElementById('paragraph');
-const startButton = document.getElementById('startButton');
-const stopButton = document.getElementById('stopButton');
 let isSpeaking = false;
 let synth = window.speechSynthesis;
 let utterance = null;
@@ -14,47 +11,84 @@ if (!synth) {
         console.warn('Speech synthesis methods not fully supported.');
     }
 
-    // Attempt to start speech synthesis immediately
+    // Attempt to start speech synthesis immediately with initial paragraph text
     startSpeechSynthesis();
 }
 
 // Function to start speech synthesis
 function startSpeechSynthesis() {
+    const paragraph = document.getElementById('paragraph');
     if (!synth.speaking) {
         utterance = new SpeechSynthesisUtterance(paragraph.textContent);
         utterance.addEventListener('end', () => {
             isSpeaking = false;
-            if (startButton) startButton.innerText = 'Start Reading';
+            updateButtonState();
         });
         synth.speak(utterance);
         isSpeaking = true;
-        if (startButton) startButton.innerText = 'Pause Reading';
+        updateButtonState();
     } else {
         synth.resume();
         isSpeaking = true;
-        if (startButton) startButton.innerText = 'Pause Reading';
+        updateButtonState();
     }
 }
 
-// Event listeners for buttons (if needed)
+// Function to pause speech synthesis
+function pauseSpeechSynthesis() {
+    synth.pause();
+    isSpeaking = false;
+    updateButtonState();
+}
+
+// Function to stop speech synthesis
+function stopSpeechSynthesis() {
+    synth.cancel();
+    isSpeaking = false;
+    updateButtonState();
+}
+
+// Function to update button text based on speech synthesis state
+function updateButtonState() {
+    const startButton = document.getElementById('startButton');
+    if (isSpeaking) {
+        startButton.innerText = 'Pause Reading';
+    } else {
+        startButton.innerText = 'Resume Reading';
+    }
+}
+
+// Event listeners for buttons
+const startButton = document.getElementById('startButton');
 if (startButton) {
     startButton.addEventListener('click', () => {
         if (!isSpeaking) {
             startSpeechSynthesis();
         } else {
-            synth.pause();
-            isSpeaking = false;
-            startButton.innerText = 'Resume Reading';
+            pauseSpeechSynthesis();
         }
     });
 }
 
+const stopButton = document.getElementById('stopButton');
 if (stopButton) {
     stopButton.addEventListener('click', () => {
-        if (isSpeaking) {
-            synth.cancel();
-            isSpeaking = false;
-            if (startButton) startButton.innerText = 'Start Reading';
-        }
+        stopSpeechSynthesis();
     });
 }
+
+// Event listener for text-to-speech conversion button
+const convertButton = document.getElementById('convertButton');
+if (convertButton) {
+    convertButton.addEventListener('click', () => {
+        const textToRead = document.getElementById('textToRead').value.trim();
+        if (textToRead) {
+            utterance = new SpeechSynthesisUtterance(textToRead);
+            synth.speak(utterance);
+            isSpeaking = true;
+            updateButtonState();
+        } else {
+            alert('Please enter text to read.');
+        }
+    });
+};
